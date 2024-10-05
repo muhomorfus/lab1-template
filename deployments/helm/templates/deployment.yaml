@@ -32,3 +32,5 @@ spec:
               value: {{ quote .Values.postgresql.password }}
             - name: PGDB
               value: {{ quote .Values.postgresql.db }}
+            - name: PGSSL
+              value: {{ quote .Values.postgresql.sslEnabled }}
