@@ -49,7 +49,7 @@ func (m *Manager) Update(ctx context.Context, patch models.Person) (*models.Pers
 	}
 
 	if err := m.repo.Update(ctx, *person); err != nil {
-		return nil, fmt.Errorf("create user by repo: %w", err)
+		return nil, fmt.Errorf("update user in repo: %w", err)
 	}
 
 	return person, nil
