@@ -98,6 +98,17 @@ jobs:
       - name: Migrate DB
         run: goose --dir=deployments/migrations postgres "postgres://${{ secrets.PGUSER }}:${{ secrets.PGPASSWORD }}@127.0.0.1:${{ secrets.PGPORT }}/${{ secrets.PGDB }}" up
 
+      - name: Update helm chart
+        run: >
+          helm upgrade --install --create-namespace --namespace avknyazhev
+          --set 'image.tag=${{ github.sha }}'
+          --set 'postgresql.host=${{ secrets.PGHOST }}'
+          --set 'postgresql.port=${{ secrets.PGPORT }}'
+          --set 'postgresql.user=${{ secrets.PGUSER }}'
+          --set 'postgresql.password=${{ secrets.PGPASSWORD }}'
+          --set 'postgresql.db=${{ secrets.PGDB }}'
+          person-service deployments/helm
+
   autograding:
     name: Autograding
     needs: [ "deploy" ]
