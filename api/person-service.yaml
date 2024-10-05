@@ -76,7 +76,7 @@ paths:
       tags:
       - Person REST API operations
       summary: Remove Person by ID
-      operationId: editPerson_1
+      operationId: deletePerson
       parameters:
       - name: id
         in: path
