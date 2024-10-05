@@ -21,14 +21,14 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: PORT
-              value: {{ .Values.port }}
+              value: {{ quote .Values.port }}
             - name: PGHOST
-              value: {{ .Values.postgresql.host }}
+              value: {{ quote .Values.postgresql.host }}
             - name: PGPORT
-              value: {{ .Values.postgresql.port }}
+              value: {{ quote .Values.postgresql.port }}
             - name: PGUSER
-              value: {{ .Values.postgresql.user }}
+              value: {{ quote .Values.postgresql.user }}
             - name: PGPASSWORD
-              value: {{ .Values.postgresql.password }}
+              value: {{ quote .Values.postgresql.password }}
             - name: PGDB
-              value: {{ .Values.postgresql.db }}
+              value: {{ quote .Values.postgresql.db }}
