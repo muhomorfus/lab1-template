@@ -26,3 +26,21 @@ func (p *Person) Validate() error {
 
 	return nil
 }
+
+func (p *Person) Merge(merging Person) {
+	if merging.Name != "" {
+		p.Name = merging.Name
+	}
+
+	if merging.Age != nil {
+		p.Age = merging.Age
+	}
+
+	if merging.Address != nil {
+		p.Address = merging.Address
+	}
+
+	if merging.Work != nil {
+		p.Work = merging.Work
+	}
+}

@@ -36,16 +36,23 @@ func (m *Manager) Get(ctx context.Context, id int) (*models.Person, error) {
 	return person, nil
 }
 
-func (m *Manager) Update(ctx context.Context, person models.Person) (*models.Person, error) {
+func (m *Manager) Update(ctx context.Context, patch models.Person) (*models.Person, error) {
+	person, err := m.repo.Get(ctx, patch.ID)
+	if err != nil {
+		return nil, fmt.Errorf("get user from repo: %w", err)
+	}
+
+	person.Merge(patch)
+
 	if err := person.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid person to update: %w", err)
 	}
 
-	if err := m.repo.Update(ctx, person); err != nil {
+	if err := m.repo.Update(ctx, *person); err != nil {
 		return nil, fmt.Errorf("create user by repo: %w", err)
 	}
 
-	return &person, nil
+	return person, nil
 }
 
 func (m *Manager) Delete(ctx context.Context, id int) error {
@@ -64,6 +71,8 @@ func (m *Manager) List(ctx context.Context) ([]models.Person, error) {
 
 	return persons, nil
 }
+
+//go:generate mockery --all --with-expecter --exported --output mocks/
 
 type personRepository interface {
 	Create(ctx context.Context, person models.Person) (int, error)
