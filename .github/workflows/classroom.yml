@@ -45,8 +45,8 @@ jobs:
       - name: Test all
         run: go test -cover ./...
 
-  image:
-    name: Build Docker image
+  deploy:
+    name: Deploy
     needs: [ "build", "test" ]
     runs-on: ubuntu-latest
     permissions:
@@ -74,8 +74,33 @@ jobs:
           push: true
           tags: muhomorfus/person-service:${{ github.sha }}
 
+      - uses: mscno/setup-goose@v1
+
+      - uses: azure/k8s-set-context@v1
+        name: Set K8s context
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - uses: azure/setup-kubectl@v4
+        name: Setup kubectl
+
+      - uses: azure/setup-kubectl@v4
+        name: Setup helm
+
+      - name: Make port-forward
+        run: >
+          kubectl port-forward
+          $(kubectl get pods -o jsonpath={.items..metadata.name} -l application=spilo,cluster-name=person-service-db,spilo-role=master -n avknyazhev)
+          ${{ secrets.PGPORT }}:${{ secrets.PGPORT }}
+          -n avknyazhev &
+
+      - name: Migrate DB
+        run: goose --dir=deployments/migrations postgres "postgres://${{ secrets.PGUSER }}:${{ secrets.PGPASSWORD }}@127.0.0.1:${{ secrets.PGPORT }}/${{ secrets.PGDB }}" up
+
   autograding:
     name: Autograding
+    needs: [ "deploy" ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -93,13 +118,3 @@ jobs:
       - name: Autograding
         uses: education/autograding@v1
         continue-on-error: true
-
-      - name: Github auto grader mark
-        uses: Romanow/google-sheet-autograder-marker@v1.0
-        with:
-          google_token: ${{secrets.GOOGLE_API_KEY}}
-          sheet_id: "1xkgjUX6Qmk7rdJG-QPOToav-HWWtthJjnShIKnw3oIY"
-          homework_number: 1
-          user_column: 'D'
-          column_offset: 'F'
-          mark: "'+"
